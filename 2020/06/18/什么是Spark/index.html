@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      751 字
+      747 字
     </span>
   
 
@@ -208,7 +208,7 @@
 <p>Spark提供的接口非常丰富。除了基于Python、Java、Scala和SQL的简单易用的API以及丰富的程序库外，Spark还能与其他大数据工具密切配合使用，例如Hadoop。</p>
 <p>虽然Spark可以通过Python、Java或Scala使用，但它是用Scala写的，需要运行在Java环境当中。</p>
 <p>PySpark是Spark为Python开发者提供的API。</p>
-<h2 id="安装Spark并尝试启动PySpark"><a href="#安装Spark并尝试启动PySpark" class="headerlink" title="安装Spark并尝试启动PySpark"></a>安装Spark并尝试启动PySpark</h2><p>从基础镜像新建一个容器</p>
+<h2 id="安装Spark"><a href="#安装Spark" class="headerlink" title="安装Spark"></a>安装Spark</h2><p>从基础镜像新建一个容器</p>
 <pre><code class="hljs applescript">sudo docker <span class="hljs-built_in">run</span> -<span class="hljs-keyword">it</span> <span class="hljs-comment">--name spark ubuntu</span>
 apt update</code></pre>
 
@@ -251,9 +251,10 @@ export PYSPARK_PYTHON=python3</code></pre>
 
 <p>注意：py4j-0.10.8.1-src.zip要到$SPARK_HOME/python/lib目录查看是否是这个名称。不同版本的py4j的名称会有差别</p>
 <p>最后激活环境变量</p>
-<pre><code class="hljs bash"><span class="hljs-built_in">source</span> ~/.bashrc</code></pre>
+<pre><code class="hljs armasm"><span class="hljs-symbol">source</span> ~/.<span class="hljs-keyword">bashrc</span>
+<span class="hljs-keyword">pyspark</span></code></pre>
 
-<p>终于跑起来了，然后可以跑一下example</p>
+<p><img src="https://i.loli.net/2020/06/18/ApoqKVFbMjP8JEv.png" srcset="/img/loading.gif" alt="pyspark"><br>终于跑起来了，然后可以跑一下example</p>
 <pre><code class="hljs applescript">/usr/<span class="hljs-keyword">local</span>/spark/bin/<span class="hljs-built_in">run</span>-example SparkPi <span class="hljs-number">10</span></code></pre>
 
 <p>会发现输出了好多INFO级别的log，如果不想看那么多日志，就需要配置log4j的日志打印详细级别</p>
