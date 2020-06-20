@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1k 字
+      1.1k 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      28
+      29
        分钟
     </span>
   
@@ -286,6 +286,9 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
 
 <p>然后利用jupyter的命令初始命令这样以后就不用每次新建容器的时候重设密码了</p>
 <pre><code class="hljs ebnf"><span class="hljs-attribute">jupyter notebook passwd</span></code></pre>
+
+<p>在Jupyter Notebook中使用PySpark有一种通用的方法：使用findSpark包在代码中提供Spark Context。<br>findSpark包不是特定于Jupyter Notebook，你也可以在你喜欢的IDE中使用这个技巧。 要安装findspark</p>
+<pre><code class="hljs cmake">pip3 <span class="hljs-keyword">install</span> findspark</code></pre>
 
 <p>之后就可以ctrl+d退出容器创建pyspark镜像啦</p>
 <pre><code class="hljs ebnf"><span class="hljs-attribute">sudo docker commit spark pyspark</span></code></pre>
