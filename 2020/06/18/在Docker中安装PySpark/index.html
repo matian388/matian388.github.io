@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="MTX">
+  <meta name="keywords" content="">
+  <title>在Docker中安装PySpark - MTX&#39;s SPACE</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>MTX</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('https://i.loli.net/2020/06/17/3QUyCwtgA2r7RGB.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-06-18 15:05">
+      2020年6月18日 下午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      29
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>Apache Spark 是一种用于处理、查询和分析大数据的快速集群计算框架。Apache Spark 是基于内存计算，这是他与其他几种大数据框架相比的一大优势。Apache Spark 是开源的，也是最著名的大数据框架之一。当它使用内存计算时，它比传统map-reduce任务快100倍；当它使用磁盘时比传统的map-reduce 任务快10倍。</p>
+<p>Spark提供的接口非常丰富。除了基于Python、Java、Scala和SQL的简单易用的API以及丰富的程序库外，Spark还能与其他大数据工具密切配合使用，例如Hadoop。</p>
+<p>虽然Spark可以通过Python、Java或Scala使用，但它是用Scala写的，需要运行在Java环境当中。</p>
+<p>PySpark是Spark为Python开发者提供的API。</p>
+<h2 id="安装Spark"><a href="#安装Spark" class="headerlink" title="安装Spark"></a>安装Spark</h2><p>从基础镜像新建一个容器</p>
+<pre><code class="hljs applescript">sudo docker <span class="hljs-built_in">run</span> -<span class="hljs-keyword">it</span> <span class="hljs-comment">--name spark ubuntu</span>
+apt update</code></pre>
+
+<p>安装python3、Java环境和scala并测试</p>
+<pre><code class="hljs mipsasm">apt <span class="hljs-keyword">install </span>-y python3 python3-pip
+apt <span class="hljs-keyword">install </span>-y openjdk<span class="hljs-number">-8</span>-<span class="hljs-keyword">jdk</span>
+<span class="hljs-keyword">java </span>-version
+apt <span class="hljs-keyword">install </span>-y <span class="hljs-keyword">scala</span>
+<span class="hljs-keyword">scala </span>-version</code></pre>
+
+<p>接下来去<a href="http://spark.apache.org/downloads.html" target="_blank" rel="noopener">官网</a>下载最新版的Spark并安装</p>
+<pre><code class="hljs angelscript">apt install -y wget
+wget https:<span class="hljs-comment">//mirrors.tuna.tsinghua.edu.cn/apache/spark/spark-3.0.0-preview2/spark-3.0.0-preview2-bin-hadoop2.7.tgz</span>
+tar xvf spark<span class="hljs-number">-3.0</span><span class="hljs-number">.0</span>-preview2-bin-hadoop2<span class="hljs-number">.7</span>.tgz
+rm spark<span class="hljs-number">-3.0</span><span class="hljs-number">.0</span>-preview2-bin-hadoop2<span class="hljs-number">.7</span>.tgz
+mv spark<span class="hljs-number">-3.0</span><span class="hljs-number">.0</span>-preview2-bin-hadoop2<span class="hljs-number">.7</span>.tgz /usr/local/spark/</code></pre>
+
+<p>最后把Spark加入环境变量</p>
+<pre><code class="hljs properties"><span class="hljs-attr">apt</span> <span class="hljs-string">install -y vim</span>
+<span class="hljs-attr">vim</span> <span class="hljs-string">~/.bashrc</span></code></pre>
+
+<p>添加SPARK_HOME与PATH（具体SPARK_HOME路径自己设定）</p>
+<pre><code class="hljs routeros"><span class="hljs-builtin-name">export</span> <span class="hljs-attribute">SPARK_HOME</span>=/usr/local/spark
+<span class="hljs-builtin-name">export</span> <span class="hljs-attribute">PATH</span>=<span class="hljs-variable">$&#123;SPARK_HOME&#125;</span>/bin:$PATH</code></pre>
+
+<p>激活环境变量</p>
+<pre><code class="hljs bash"><span class="hljs-built_in">source</span> ~/.bashrc</code></pre>
+
+<p>然后会发现pyspark跑不起来</p>
+<h2 id="填坑并启动PySpark"><a href="#填坑并启动PySpark" class="headerlink" title="填坑并启动PySpark"></a>填坑并启动PySpark</h2><p>首先Py4J在驱动程序上用于Python和Java SparkContext对象之间的本地通信，大型数据传输是通过不同的机制执行的。<br>所以需要用pip3安装py4j</p>
+<pre><code class="hljs cmake">apt <span class="hljs-keyword">install</span> -y python3-pip
+pip3 <span class="hljs-keyword">install</span> py4j</code></pre>
+
+<p>然后会发现pyspark依然跑不起来<br>是因为我用的是python3<br>所以需要添加python相关环境变量</p>
+<pre><code class="hljs jboss-cli">vim ~<span class="hljs-string">/.bashrc</span></code></pre>
+
+<p>添加如下变量</p>
+<pre><code class="hljs crystal">export PYTHONPATH=$SPARK_HOME/<span class="hljs-symbol">python:</span>$SPARK_HOME/python/<span class="hljs-class"><span class="hljs-keyword">lib</span>/<span class="hljs-title">py4j</span>-0.10.8.1-<span class="hljs-title">src</span>.<span class="hljs-title">zip</span>:$<span class="hljs-title">PYTHONPATH</span></span>
+export PYSPARK_PYTHON=python3</code></pre>
+
+<p>注意：py4j-0.10.8.1-src.zip要到$SPARK_HOME/python/lib目录查看是否是这个名称。不同版本的py4j的名称会有差别</p>
+<p>最后激活环境变量</p>
+<pre><code class="hljs armasm"><span class="hljs-symbol">source</span> ~/.<span class="hljs-keyword">bashrc</span>
+<span class="hljs-keyword">pyspark</span></code></pre>
+
+<p><img src="https://i.loli.net/2020/06/18/ApoqKVFbMjP8JEv.png" srcset="/img/loading.gif" alt="pyspark"><br>终于跑起来了，然后可以跑一下example</p>
+<pre><code class="hljs applescript">/usr/<span class="hljs-keyword">local</span>/spark/bin/<span class="hljs-built_in">run</span>-example SparkPi <span class="hljs-number">10</span></code></pre>
+
+<p>会发现输出了好多INFO级别的log，如果不想看那么多日志，就需要配置log4j的日志打印详细级别</p>
+<pre><code class="hljs routeros">cd /usr/local/spark/
+cp conf/log4j.properties.template conf/log4j.properties
+vim conf/log4j.properties
+将 
+log4j.<span class="hljs-attribute">rootCategory</span>=INFO,<span class="hljs-built_in"> console </span> 
+替换为
+log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pre>
+
+
+<p>这个WARNING是因为Java KDJ版本高于8造成的，可以忽略</p>
+<pre><code class="hljs asciidoc"><span class="hljs-symbol">WARNING: </span>An illegal reflective access operation has occurred
+<span class="hljs-symbol">WARNING: </span>Illegal reflective access by org.apache.spark.unsafe.Platform (file:/usr/local/spark/jars/spark-unsafe<span class="hljs-emphasis">_2.12-3.0.0-preview2.jar) to constructor java.nio.DirectByteBuffer(long,int)</span>
+<span class="hljs-emphasis">WARNING: Please consider reporting this to the maintainers of org.apache.spark.unsafe.Platform</span>
+<span class="hljs-emphasis">WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations</span>
+<span class="hljs-emphasis">WARNING: All illegal access operations will be denied in a future release</span></code></pre>
+
+<h2 id="在jupyter-notebook中使用pyspark"><a href="#在jupyter-notebook中使用pyspark" class="headerlink" title="在jupyter notebook中使用pyspark"></a>在jupyter notebook中使用pyspark</h2><p>首先安装jupyter lab</p>
+<pre><code class="hljs cmake">pip3 <span class="hljs-keyword">install</span> jupyterlab</code></pre>
+
+<p>然后利用jupyter的命令创建配置文件</p>
+<pre><code class="hljs verilog">jupyter notebook --<span class="hljs-keyword">generate</span>-<span class="hljs-keyword">config</span></code></pre>
+
+<p>进入配置文件配置</p>
+<pre><code class="hljs ini"><span class="hljs-attr">c.NotebookApp.ip</span> = <span class="hljs-string">'0.0.0.0'</span> <span class="hljs-comment"># 让外部可以访问</span>
+<span class="hljs-attr">c.NotebookApp.port</span> = <span class="hljs-number">8888</span> <span class="hljs-comment"># 监听端口</span></code></pre>
+
+<p>然后利用jupyter的命令初始命令这样以后就不用每次新建容器的时候重设密码了</p>
+<pre><code class="hljs ebnf"><span class="hljs-attribute">jupyter notebook passwd</span></code></pre>
+
+<p>在Jupyter Notebook中使用PySpark有一种通用的方法：使用findSpark包在代码中提供Spark Context。<br>findSpark包不是特定于Jupyter Notebook，你也可以在你喜欢的IDE中使用这个技巧。 要安装findspark</p>
+<pre><code class="hljs cmake">pip3 <span class="hljs-keyword">install</span> findspark</code></pre>
+
+<p>之后就可以ctrl+d退出容器创建pyspark镜像啦</p>
+<pre><code class="hljs ebnf"><span class="hljs-attribute">sudo docker commit spark pyspark</span></code></pre>
+
+<p>接下来就是最后一步启动pyspark容器</p>
+<pre><code class="hljs dockerfile">sudo docker <span class="hljs-keyword">run</span><span class="bash"> -itd --name pyspark -p 8889:8888 pyspark bash -c <span class="hljs-string">'cd ~&amp;&amp;jupyter lab --allow-root'</span></span></code></pre>
+
+<p>-p 端口映射前面8889是宿主机端口，后面的8888是容器，因为宿主机的8888已被占用我就随便写了8889<br>由于容器默认是root用户，而jupyter lab默认是不允许root用户启动的，所以需添加<code>--allow-root</code></p>
+<p>这样我们就可以从宿主机的ip:8889访问到能运行pyspark的jupyter lab了</p>
+<p>让我们测试一下</p>
+<pre><code class="hljs haskell"><span class="hljs-title">from</span> pyspark <span class="hljs-keyword">import</span> SparkContext
+<span class="hljs-title">from</span> pyspark <span class="hljs-keyword">import</span> SparkConf
+<span class="hljs-title">sc</span> = <span class="hljs-type">SparkContext</span>()
+<span class="hljs-class"><span class="hljs-keyword">data</span> = list(<span class="hljs-title">range</span>(1,100))</span>
+<span class="hljs-title">rdd</span> = sc.parallelize(<span class="hljs-class"><span class="hljs-keyword">data</span>)</span>
+<span class="hljs-title">rdd</span>.collect()</code></pre>
+
+<p><img src="https://i.loli.net/2020/06/20/Up9hP3iGkMvmrWe.png" srcset="/img/loading.gif" alt="PySpark"></p>
+<p>完美！</p>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%A1%86%E6%9E%B6/">框架</a>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%A1%86%E6%9E%B6/Spark/">Spark</a>
+                    
+                      <a class="hover-with-bg" href="/categories/Docker/">Docker</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/MapReduce/">MapReduce</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Spark/">Spark</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Docker/">Docker</a>
+                    
+                      <a class="hover-with-bg" href="/tags/PySpark/">PySpark</a>
+                    
+                  </div>
+                
+              </div>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/06/20/%E5%88%A9%E7%94%A8PySpark%E8%BF%9B%E8%A1%8CRDD%E7%BC%96%E7%A8%8B%20--%20spark%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">利用PySpark进行RDD编程 -- spark学习笔记（一）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                      <a href="/2020/06/17/%E5%9F%BA%E4%BA%8EDocker%E6%90%AD%E5%BB%BAHadoop%E9%9B%86%E7%BE%A4/">
+                        <span class="hidden-mobile">基于Docker搭建Hadoop集群</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "在Docker中安装PySpark&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
