@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="MTX">
   <meta name="keywords" content="">
-  <title>什么是Spark以及PySpark - MTX&#39;s SPACE</title>
+  <title>在jupyter lab中运行PySpark安装到Docker中 - MTX&#39;s SPACE</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      747 字
+      1k 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      21
+      28
        分钟
     </span>
   
@@ -274,7 +274,38 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
 <span class="hljs-emphasis">WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations</span>
 <span class="hljs-emphasis">WARNING: All illegal access operations will be denied in a future release</span></code></pre>
 
-<h2 id="在jupyter-notebook中使用pyspark"><a href="#在jupyter-notebook中使用pyspark" class="headerlink" title="在jupyter notebook中使用pyspark"></a>在jupyter notebook中使用pyspark</h2>
+<h2 id="在jupyter-notebook中使用pyspark"><a href="#在jupyter-notebook中使用pyspark" class="headerlink" title="在jupyter notebook中使用pyspark"></a>在jupyter notebook中使用pyspark</h2><p>首先安装jupyter lab</p>
+<pre><code class="hljs cmake">pip3 <span class="hljs-keyword">install</span> jupyterlab</code></pre>
+
+<p>然后利用jupyter的命令创建配置文件</p>
+<pre><code class="hljs verilog">jupyter notebook --<span class="hljs-keyword">generate</span>-<span class="hljs-keyword">config</span></code></pre>
+
+<p>进入配置文件配置</p>
+<pre><code class="hljs ini"><span class="hljs-attr">c.NotebookApp.ip</span> = <span class="hljs-string">'0.0.0.0'</span> <span class="hljs-comment"># 让外部可以访问</span>
+<span class="hljs-attr">c.NotebookApp.port</span> = <span class="hljs-number">8888</span> <span class="hljs-comment"># 监听端口</span></code></pre>
+
+<p>然后利用jupyter的命令初始命令这样以后就不用每次新建容器的时候重设密码了</p>
+<pre><code class="hljs ebnf"><span class="hljs-attribute">jupyter notebook passwd</span></code></pre>
+
+<p>之后就可以ctrl+d退出容器创建pyspark镜像啦</p>
+<pre><code class="hljs ebnf"><span class="hljs-attribute">sudo docker commit spark pyspark</span></code></pre>
+
+<p>接下来就是最后一步启动pyspark容器</p>
+<pre><code class="hljs dockerfile">sudo docker <span class="hljs-keyword">run</span><span class="bash"> -itd --name pyspark -p 8889:8888 pyspark bash -c <span class="hljs-string">'cd ~&amp;&amp;jupyter lab --allow-root'</span></span></code></pre>
+
+<p>-p 端口映射前面8889是宿主机端口，后面的8888是容器，因为宿主机的8888已被占用我就随便写了8889<br>由于容器默认是root用户，而jupyter lab默认是不允许root用户启动的，所以需添加<code>--allow-root</code></p>
+<p>这样我们就可以从宿主机的ip:8889访问到能运行pyspark的jupyter lab了</p>
+<p>让我们测试一下</p>
+<pre><code class="hljs haskell"><span class="hljs-title">from</span> pyspark <span class="hljs-keyword">import</span> SparkContext
+<span class="hljs-title">from</span> pyspark <span class="hljs-keyword">import</span> SparkConf
+<span class="hljs-title">sc</span> = <span class="hljs-type">SparkContext</span>()
+<span class="hljs-class"><span class="hljs-keyword">data</span> = list(<span class="hljs-title">range</span>(1,100))</span>
+<span class="hljs-title">rdd</span> = sc.parallelize(<span class="hljs-class"><span class="hljs-keyword">data</span>)</span>
+<span class="hljs-title">rdd</span>.collect()</code></pre>
+
+<p><img src="https://i.loli.net/2020/06/20/Up9hP3iGkMvmrWe.png" srcset="/img/loading.gif" alt="PySpark"></p>
+<p>完美！</p>
+
             </article>
             <hr>
             <div>
@@ -287,6 +318,8 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
                     
                       <a class="hover-with-bg" href="/categories/%E6%A1%86%E6%9E%B6/Spark/">Spark</a>
                     
+                      <a class="hover-with-bg" href="/categories/Docker/">Docker</a>
+                    
                   </div>
                 
                 
@@ -296,6 +329,8 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
                       <a class="hover-with-bg" href="/tags/MapReduce/">MapReduce</a>
                     
                       <a class="hover-with-bg" href="/tags/Spark/">Spark</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Docker/">Docker</a>
                     
                       <a class="hover-with-bg" href="/tags/PySpark/">PySpark</a>
                     
@@ -452,7 +487,7 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "什么是Spark以及PySpark&nbsp;",
+        "在jupyter lab中运行PySpark安装到Docker中&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
