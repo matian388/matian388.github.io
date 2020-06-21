@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      29
+      30
        分钟
     </span>
   
@@ -294,7 +294,7 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
 <pre><code class="hljs ebnf"><span class="hljs-attribute">sudo docker commit spark pyspark</span></code></pre>
 
 <p>接下来就是最后一步启动pyspark容器</p>
-<pre><code class="hljs dockerfile">sudo docker <span class="hljs-keyword">run</span><span class="bash"> -itd --name pyspark -p 8889:8888 pyspark bash -c <span class="hljs-string">'cd ~&amp;&amp;jupyter lab --allow-root'</span></span></code></pre>
+<pre><code class="hljs dockerfile">sudo docker <span class="hljs-keyword">run</span><span class="bash"> -dit --name hantest -p 8890:8888 pyspark bash -c <span class="hljs-string">"export SPARK_HOME=/usr/local/spark &amp;&amp; export PATH=/usr/local/spark/bin:<span class="hljs-variable">$PATH</span> &amp;&amp; export PYTHONPATH=/usr/local/spark/python &amp;&amp; export PYSPARK_PYTHON=python3 &amp;&amp; cd ~ &amp;&amp; jupyter lab --allow-root"</span></span></code></pre>
 
 <p>-p 端口映射前面8889是宿主机端口，后面的8888是容器，因为宿主机的8888已被占用我就随便写了8889<br>由于容器默认是root用户，而jupyter lab默认是不允许root用户启动的，所以需添加<code>--allow-root</code></p>
 <p>这样我们就可以从宿主机的ip:8889访问到能运行pyspark的jupyter lab了</p>
@@ -333,9 +333,9 @@ log4j.<span class="hljs-attribute">rootCategory</span>=ERROR, console</code></pr
                     
                       <a class="hover-with-bg" href="/tags/Spark/">Spark</a>
                     
-                      <a class="hover-with-bg" href="/tags/Docker/">Docker</a>
-                    
                       <a class="hover-with-bg" href="/tags/PySpark/">PySpark</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Docker/">Docker</a>
                     
                   </div>
                 

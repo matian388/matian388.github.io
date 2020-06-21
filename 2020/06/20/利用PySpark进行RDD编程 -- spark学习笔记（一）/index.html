@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      348 字
+      742 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      7
+      16
        分钟
     </span>
   
@@ -216,8 +216,50 @@
 <p>基于Spark的惰性计算，RDD并不会把文件读入内存，而是在真正需要输出时再读取从而可以对内存与cpu的使用更加合理。</p>
 <p>比如接下来运行<code>lines.first()</code>读取第一行时，Spark就只会读取README.me的一行从而返回结果，这个pandas是很不一样的。</p>
 <h4 id="方法二：在驱动器程序中对一个集合进行并行化创建"><a href="#方法二：在驱动器程序中对一个集合进行并行化创建" class="headerlink" title="方法二：在驱动器程序中对一个集合进行并行化创建"></a>方法二：在驱动器程序中对一个集合进行并行化创建</h4><p><code>sc.parallelize([])</code></p>
-<p>这是创建一个RDD最简单的方式，在学习Spark时会经常使用</p>
+<p>这是创建一个RDD最简单的方式，在学习Spark时会经常使用，会把数据放入内存</p>
 <pre><code class="hljs ini"><span class="hljs-attr">lines</span> = sc.parallelize([<span class="hljs-string">'spark'</span>, <span class="hljs-string">'i like spark'</span>])</code></pre>
+
+<h3 id="常见的转化操作-map-和行动操作-reduce"><a href="#常见的转化操作-map-和行动操作-reduce" class="headerlink" title="常见的转化操作(map)和行动操作(reduce)"></a>常见的转化操作(map)和行动操作(reduce)</h3><h4 id="针对每个元素的转化操作-map-filter"><a href="#针对每个元素的转化操作-map-filter" class="headerlink" title="针对每个元素的转化操作(map, filter)"></a>针对每个元素的转化操作(map, filter)</h4><ul>
+<li><p><code>map(func)</code> 接收一个函数，用于RDD的每个元素，将返回结果组成新的RDD</p>
+</li>
+<li><p><code>filter(func)</code> 接受一个函数，将RDD中满足该函数的结果组成新的RDD</p>
+</li>
+<li><p><code>flatMap(func)</code> 接受一个函数，用于RDD的每个元素，得到一个包含各个迭代器可访问到所有元素的RDD，俗称“拍平”</p>
+</li>
+</ul>
+<h4 id="一些简单的集合类型操作"><a href="#一些简单的集合类型操作" class="headerlink" title="一些简单的集合类型操作"></a>一些简单的集合类型操作</h4><ul>
+<li><p><code>distinct()</code> 生成一个只包含不同元素的RDD</p>
+</li>
+<li><p><code>union(rdd2)</code> 生成一个包含两个RDD所有元素的RDD</p>
+</li>
+<li><p><code>intersection(rdd2)</code> 返回两个RDD都有的元素的RDD，需要网络混洗数据因此性能较差</p>
+</li>
+<li><p><code>subtract(rdd2)</code> 返回存在于第一个而不存在第二个RDD的所有元素组成的RDD</p>
+</li>
+<li><p><code>cartesian(rdd2)</code> 返回两个RDD的所有元素笛卡尔积的(a, b)对，开销巨大</p>
+</li>
+</ul>
+<h4 id="一些常用的行动操作"><a href="#一些常用的行动操作" class="headerlink" title="一些常用的行动操作"></a>一些常用的行动操作</h4><ul>
+<li><p><code>collect()</code> 返回RDD的所有元素</p>
+</li>
+<li><p><code>count()</code> 返回RDD的元素个数</p>
+</li>
+<li><p><code>countByValue()</code> 各元素在RDD中出现的次数</p>
+</li>
+<li><p><code>take(num)</code> 返回num个元素</p>
+</li>
+<li><p><code>top(num)</code> 返回RDD最前面的num个元素</p>
+</li>
+<li><p><code>reduce(func)</code> 并行整合RDD中所有数据</p>
+</li>
+<li><p><code>fold(init_value, func)</code> 并行整合RDD中所有数据并带有初始值</p>
+</li>
+<li><p><code>aggrregate(init_value, seq_func, comb_func)</code> 聚合函数，包含初始值、元素间函数与节点间整合函数</p>
+</li>
+<li><p><code>foreach(func)</code> 对RDD的每个元素使用这个函数而不做返回，类似无返回值但应用操作的map函数</p>
+</li>
+</ul>
+
             </article>
             <hr>
             <div>
