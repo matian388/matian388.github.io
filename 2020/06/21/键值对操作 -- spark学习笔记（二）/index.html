@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      2 字
+      506 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      12
        分钟
     </span>
   
@@ -204,7 +204,57 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3>
+              <h3 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h3><p>可以根据我的这篇文章: <a href="/2020/06/18/%E5%9C%A8Docker%E4%B8%AD%E5%AE%89%E8%A3%85PySpark/" title="在Docker中安装PySpark">在Docker中安装PySpark</a>，创建一个PySpark容器在jupyter lab中进行尝试</p>
+<p>或者</p>
+<p>在这个<a href="https://community.cloud.databricks.com/" target="_blank" rel="noopener">免费的spark平台</a>注册一个账户，创建集群进行编程，有16GB的内存对于初学是够用的了，具体创建方法可参考<a href="https://zhuanlan.zhihu.com/p/143151136" target="_blank" rel="noopener">这篇文章</a></p>
+<h3 id="创建pair-RDD-键值对"><a href="#创建pair-RDD-键值对" class="headerlink" title="创建pair RDD(键值对)"></a>创建pair RDD(键值对)</h3><p>在pyspark当中，只需要对一个RDD进行map操作，返回的结果是一个二元元组的形式，就会创建一个pair RDD。</p>
+<p>例如在一个文本RDD当中用第一个词作为key创建pair RDD</p>
+<pre><code class="hljs gml">pairs = lines.map(lambda <span class="hljs-symbol">x</span>: (<span class="hljs-symbol">x</span>.split(<span class="hljs-string">' '</span>)[<span class="hljs-number">0</span>], <span class="hljs-symbol">x</span>))</code></pre>
+
+<h3 id="pair-RDD常用的转化操作"><a href="#pair-RDD常用的转化操作" class="headerlink" title="pair RDD常用的转化操作"></a>pair RDD常用的转化操作</h3><ul>
+<li><p><code>reduceByKey(func)</code> 按func函数合并具有相同key的值</p>
+</li>
+<li><p><code>groupByKey()</code> 对相同key的值分组</p>
+</li>
+<li><p><code>mapValues(func)</code> 对每个值应用func函数</p>
+</li>
+<li><p><code>flatMapValues(func)</code> 可以用func将一个值拆成多个键值对(键相同)</p>
+</li>
+<li><p><code>keys()</code> 返回仅包含key的RDD</p>
+</li>
+<li><p><code>values()</code> 返回仅包含值的RDD</p>
+</li>
+<li><p><code>sortByKey()</code> 返回根据键排序的RDD</p>
+</li>
+</ul>
+<h3 id="pair-RDD的聚合操作"><a href="#pair-RDD的聚合操作" class="headerlink" title="pair RDD的聚合操作"></a>pair RDD的聚合操作</h3><p><code>combineByKey(mapValues_func, reduceByKey_func, comb_func)</code></p>
+<p>这个方法和RDD中的聚合函数(aggregate)类似，有三个参数分别是对值的遍历、对key的合并和节点间的合并函数</p>
+<p>例如我们想计算每个key的平均值，可以用<code>mapValues</code>与<code>reduceByKey</code></p>
+<pre><code class="hljs reasonml">pairs.map<span class="hljs-constructor">Values(<span class="hljs-params">lambda</span> <span class="hljs-params">x</span>: (<span class="hljs-params">x</span>, 1)</span>).reduce<span class="hljs-constructor">ByKey(<span class="hljs-params">lambda</span> <span class="hljs-params">x</span>, <span class="hljs-params">y</span>: (<span class="hljs-params">x</span>[0] + <span class="hljs-params">y</span>[0], <span class="hljs-params">x</span>[1] + <span class="hljs-params">y</span>[1])</span>)</code></pre>
+
+<p>或者用<code>combineByKey</code>方法</p>
+<pre><code class="hljs gml">pairs.combineByKey((lambda <span class="hljs-symbol">x</span>: (<span class="hljs-symbol">x</span>, <span class="hljs-number">1</span>)), 
+                   (lambda <span class="hljs-symbol">x</span>, <span class="hljs-symbol">y</span>: (<span class="hljs-symbol">x</span>[<span class="hljs-number">0</span>] + <span class="hljs-symbol">y</span>, <span class="hljs-symbol">x</span>[<span class="hljs-number">1</span>] + <span class="hljs-number">1</span>)), 
+                   (lambda <span class="hljs-symbol">x</span>, <span class="hljs-symbol">y</span>: (<span class="hljs-symbol">x</span>[<span class="hljs-number">0</span>] + <span class="hljs-symbol">y</span>[<span class="hljs-number">0</span>], <span class="hljs-symbol">x</span>[<span class="hljs-number">1</span>] + <span class="hljs-symbol">y</span>[<span class="hljs-number">1</span>])))</code></pre>
+
+<h3 id="“内连接”、”左连接”、”右连接”"><a href="#“内连接”、”左连接”、”右连接”" class="headerlink" title="“内连接”、”左连接”、”右连接”"></a>“内连接”、”左连接”、”右连接”</h3><p>多个pair RDD可以像数据库中的表一样进行连接并且和期望的结果是一样的</p>
+<ul>
+<li><p><code>join</code> 内连接，返回具有相同key的值列表</p>
+</li>
+<li><p><code>leftOuterJoin</code> 左外连接，返回具有所有左RDD的key的值列表</p>
+</li>
+<li><p><code>rightOuterJoin</code> 右外连接，返回具有所有右RDD的key的值列表</p>
+</li>
+</ul>
+<h3 id="pair-RDD常用的行动操作"><a href="#pair-RDD常用的行动操作" class="headerlink" title="pair RDD常用的行动操作"></a>pair RDD常用的行动操作</h3><ul>
+<li><p><code>countByKey()</code> 返回每个键对应计数的dict</p>
+</li>
+<li><p><code>collectAsMap()</code> 返回key value的dict，注意key相同会被后者覆盖</p>
+</li>
+<li><p><code>lookup(key)</code> 返回key的value的数组</p>
+</li>
+</ul>
+
             </article>
             <hr>
             <div>
@@ -235,6 +285,12 @@
                 <div class="post-prevnext row">
                   <div class="post-prev col-6">
                     
+                    
+                      <a href="/2020/06/26/%E5%A6%82%E4%BD%95%E5%87%8F%E5%B0%91DataFrame%E7%9A%84%E5%86%85%E5%AD%98%E5%8D%A0%E7%94%A8/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">如何减少DataFrame的内存占用</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </div>
                   <div class="post-next col-6">
