@@ -266,7 +266,10 @@
 <h3 id="用category类型优化object类型"><a href="#用category类型优化object类型" class="headerlink" title="用category类型优化object类型"></a>用<code>category</code>类型优化object类型</h3><pre><code class="hljs elm"><span class="hljs-title">row</span> = row.<span class="hljs-keyword">as</span><span class="hljs-keyword">type</span>('category')</code></pre>
 
 <p>对于大量重复的字符串列，<code>category</code>类型可以节约95%以上的内存！</p>
-<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p>能在更节约的类型不溢出的情况下用更节约的类型，<br>如果一个列的唯一值数量小于一定比例（例如10%）就采用<code>category</code>类型</p>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><ul>
+<li>能在更节约的类型不溢出的情况下用更节约的类型，</li>
+<li>如果一个列的唯一值数量小于一定比例（例如10%）就采用<code>category</code>类型</li>
+</ul>
 <pre><code class="hljs maxima">import numpy as <span class="hljs-built_in">np</span> # <span class="hljs-built_in">linear</span> algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
  
@@ -373,8 +376,8 @@ def reduce_mem_usage(<span class="hljs-built_in">props</span>):
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/06/21/%E9%94%AE%E5%80%BC%E5%AF%B9%E6%93%8D%E4%BD%9C%20--%20spark%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/">
-                        <span class="hidden-mobile">键值对操作 -- spark学习笔记（二）</span>
+                      <a href="/2020/06/25/Spark%20SQL%20--%20spark%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/">
+                        <span class="hidden-mobile">Spark SQL -- spark学习笔记（三）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
